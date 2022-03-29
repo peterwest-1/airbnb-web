@@ -1,11 +1,16 @@
 import { withUrqlClient } from "next-urql";
+import { GeneralLocationCard } from "../components/GeneralLocationCard";
 import { Layout } from "../components/Layout";
+import { PropertyListItem } from "../components/PropertyListItem";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
   return (
     <>
-      <Layout>hi</Layout>
+      <Layout>
+        <GeneralLocationCard />
+        <PropertyListItem />
+      </Layout>
     </>
   );
 };

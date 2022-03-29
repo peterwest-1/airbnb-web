@@ -1,0 +1,5 @@
+query Property($propertyId: String!) {
+  property(id: $propertyId) {
+    ...RegularProperty
+  }
+}

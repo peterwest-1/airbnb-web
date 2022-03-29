@@ -1,0 +1,9 @@
+fragment RegularProperty on Property {
+  id
+  creatorId
+  title
+  price
+  guests
+  bedrooms
+  bathrooms
+}

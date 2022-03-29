@@ -40,10 +40,13 @@ export type Mutation = {
   addProfilePicture: Scalars['Boolean'];
   changePassword?: Maybe<User>;
   confirmUser: Scalars['Boolean'];
+  createProperty: PropertyResponse;
   forgotPassword: Scalars['Boolean'];
   login?: Maybe<UserResponse>;
   logout: Scalars['Boolean'];
   register: UserResponse;
+  removeProperty: Scalars['Boolean'];
+  updateProperty: PropertyResponse;
 };
 
 
@@ -62,6 +65,11 @@ export type MutationConfirmUserArgs = {
 };
 
 
+export type MutationCreatePropertyArgs = {
+  data: PropertyInput;
+};
+
+
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
 };
@@ -76,13 +84,66 @@ export type MutationRegisterArgs = {
   data: AuthenticationInput;
 };
 
+
+export type MutationRemovePropertyArgs = {
+  id: Scalars['String'];
+};
+
+
+export type MutationUpdatePropertyArgs = {
+  data: PropertyInput;
+  id: Scalars['String'];
+};
+
 export type PasswordInput = {
   password: Scalars['String'];
+};
+
+export type Property = {
+  __typename?: 'Property';
+  /** number of bathrooms for the property */
+  bathrooms: Scalars['Float'];
+  /** number of bedrooms for the property */
+  bedrooms: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  creatorId: Scalars['String'];
+  /** number of guests this property can accepty */
+  guests: Scalars['Float'];
+  id: Scalars['String'];
+  /** Price per night for the property */
+  price: Scalars['Float'];
+  title: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type PropertyInput = {
+  /** number of bathrooms for the property */
+  bathrooms: Scalars['Float'];
+  /** number of bedrooms for the property */
+  bedrooms: Scalars['Float'];
+  /** number of guests this property can accepty */
+  guests: Scalars['Float'];
+  /** Price per night for the property */
+  price: Scalars['Float'];
+  title: Scalars['String'];
+};
+
+export type PropertyResponse = {
+  __typename?: 'PropertyResponse';
+  errors?: Maybe<Array<FieldError>>;
+  property?: Maybe<Property>;
 };
 
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
+  properties: Array<Property>;
+  property?: Maybe<Property>;
+};
+
+
+export type QueryPropertyArgs = {
+  id: Scalars['String'];
 };
 
 export type User = {
@@ -104,6 +165,8 @@ export type UserResponse = {
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
+export type RegularPropertyFragment = { __typename?: 'Property', id: string, creatorId: string, title: string, price: number, guests: number, bedrooms: number, bathrooms: number };
+
 export type RegularUserFragment = { __typename?: 'User', id: string, email: string };
 
 export type RegularUserResponseFragment = { __typename?: 'UserResponse', user?: { __typename?: 'User', id: string, email: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null };
@@ -114,6 +177,13 @@ export type ChangePasswordMutationVariables = Exact<{
 
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword?: { __typename?: 'User', id: string, email: string } | null };
+
+export type CreatePropertyMutationVariables = Exact<{
+  data: PropertyInput;
+}>;
+
+
+export type CreatePropertyMutation = { __typename?: 'Mutation', createProperty: { __typename?: 'PropertyResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, property?: { __typename?: 'Property', id: string, creatorId: string, title: string, price: number, guests: number, bedrooms: number, bathrooms: number } | null } };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
@@ -146,6 +216,29 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, email: string } | null };
 
+export type PropertiesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PropertiesQuery = { __typename?: 'Query', properties: Array<{ __typename?: 'Property', id: string, creatorId: string, title: string, price: number, guests: number, bedrooms: number, bathrooms: number }> };
+
+export type PropertyQueryVariables = Exact<{
+  propertyId: Scalars['String'];
+}>;
+
+
+export type PropertyQuery = { __typename?: 'Query', property?: { __typename?: 'Property', id: string, creatorId: string, title: string, price: number, guests: number, bedrooms: number, bathrooms: number } | null };
+
+export const RegularPropertyFragmentDoc = gql`
+    fragment RegularProperty on Property {
+  id
+  creatorId
+  title
+  price
+  guests
+  bedrooms
+  bathrooms
+}
+    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -179,6 +272,23 @@ export const ChangePasswordDocument = gql`
 
 export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
+};
+export const CreatePropertyDocument = gql`
+    mutation CreateProperty($data: PropertyInput!) {
+  createProperty(data: $data) {
+    errors {
+      ...RegularError
+    }
+    property {
+      ...RegularProperty
+    }
+  }
+}
+    ${RegularErrorFragmentDoc}
+${RegularPropertyFragmentDoc}`;
+
+export function useCreatePropertyMutation() {
+  return Urql.useMutation<CreatePropertyMutation, CreatePropertyMutationVariables>(CreatePropertyDocument);
 };
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
@@ -230,4 +340,26 @@ export const MeDocument = gql`
 
 export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PropertiesDocument = gql`
+    query Properties {
+  properties {
+    ...RegularProperty
+  }
+}
+    ${RegularPropertyFragmentDoc}`;
+
+export function usePropertiesQuery(options?: Omit<Urql.UseQueryArgs<PropertiesQueryVariables>, 'query'>) {
+  return Urql.useQuery<PropertiesQuery>({ query: PropertiesDocument, ...options });
+};
+export const PropertyDocument = gql`
+    query Property($propertyId: String!) {
+  property(id: $propertyId) {
+    ...RegularProperty
+  }
+}
+    ${RegularPropertyFragmentDoc}`;
+
+export function usePropertyQuery(options: Omit<Urql.UseQueryArgs<PropertyQueryVariables>, 'query'>) {
+  return Urql.useQuery<PropertyQuery>({ query: PropertyDocument, ...options });
 };

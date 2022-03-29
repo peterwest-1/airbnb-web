@@ -1,0 +1,10 @@
+mutation CreateProperty($data: PropertyInput!) {
+  createProperty(data: $data) {
+    errors {
+      ...RegularError
+    }
+    property {
+      ...RegularProperty
+    }
+  }
+}
